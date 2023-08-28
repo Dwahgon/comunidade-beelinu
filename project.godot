@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="comunidade-beelinu"
+run/main_scene="res://levels/main_menu/main_menu.tscn"
 config/features=PackedStringArray("4.1", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+MultiplayerManager="*res://autoloads/multiplayer_manager.gd"
 
 [rendering]
 
