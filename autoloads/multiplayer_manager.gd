@@ -1,23 +1,29 @@
 extends Node
 
-
 # https://docs.godotengine.org/en/stable/tutorials/networking/high_level_multiplayer.html
 
+## Defines the default IP address when connecting via create_client
 const DEFAULT_IP := "127.0.0.1" # localhost
+## Defines default port for creating a server or connecting to a server
 var DEFAULT_PORT := 8335 # BEES
+## Defines the maximum amount of players a server will allow
 var MAX_PLAYERS := 20
 
+## Stores player data for all of the connected players
 var players = {}
+## Stores the current player data
 var my_player_data: NetworkPlayerData = null
 
+## Fires when a network peer has connected
 signal player_connected(network_player)
+## Fires when a network peer has disconnected
 signal player_disconnected(id)
+## Fires when we disconnect from server
 signal server_disconnected
 
 func _ready():
 	_set_env_data()
 	_connect_signals()
-
 
 func create_server(port: int = DEFAULT_PORT) -> Error:
 	var peer = ENetMultiplayerPeer.new()
@@ -29,7 +35,7 @@ func create_server(port: int = DEFAULT_PORT) -> Error:
 	print("Server created")
 	return Error.OK
 
-
+## Creates client
 func create_client(ip: String = DEFAULT_IP, port: int = DEFAULT_PORT) -> Error:
 	var peer = ENetMultiplayerPeer.new()
 	var error: Error = peer.create_client(ip, port)
@@ -40,6 +46,7 @@ func create_client(ip: String = DEFAULT_IP, port: int = DEFAULT_PORT) -> Error:
 	return Error.OK
 
 
+## Terminates connection
 func terminate() -> void:
 	multiplayer.multiplayer_peer = null
 
