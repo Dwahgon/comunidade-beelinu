@@ -60,7 +60,7 @@ scroll_fit_content_height = true
 layout_mode = 2
 text = "Entrar"
 
-[node name="Error" type="Label" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
+[node name="Message" type="Label" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
 modulate = Color(1, 0.101961, 0.101961, 1)
 layout_mode = 2
 autowrap_mode = 2

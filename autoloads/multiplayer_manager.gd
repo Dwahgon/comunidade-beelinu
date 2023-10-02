@@ -20,6 +20,8 @@ signal player_connected(network_player)
 signal player_disconnected(id)
 ## Fires when we disconnect from server
 signal server_disconnected
+signal connection_failed
+signal connection_success
 
 func _ready():
 	_set_env_data()
@@ -93,12 +95,14 @@ func _on_peer_disconnected(id: int):
 func _on_connected_to_server():
 	my_player_data = NetworkPlayerData.new(multiplayer.get_unique_id())
 	players[my_player_data.id] = my_player_data
+	connection_success.emit()
 	player_connected.emit(my_player_data)
 
 
 func _on_connected_failed():
 	print("MultiplayerManager - connection failed")
 	terminate()
+	connection_failed.emit()
 
 
 func _on_server_disconnected():

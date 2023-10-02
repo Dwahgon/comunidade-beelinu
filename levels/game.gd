@@ -8,6 +8,8 @@ func _ready():
 	MultiplayerManager.player_connected.connect(_on_player_connected)
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
 	MultiplayerManager.server_disconnected.connect(_on_server_disconnected)
+	if not multiplayer.is_server():
+		_on_player_connected(MultiplayerManager.my_player_data)
 
 
 func _create_player_character(player_data: NetworkPlayerData):
