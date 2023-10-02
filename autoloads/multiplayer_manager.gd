@@ -32,7 +32,7 @@ func create_server(port: int = DEFAULT_PORT) -> Error:
 		return error
 	multiplayer.multiplayer_peer = peer
 	my_player_data = NetworkPlayerData.new(1)
-	print("Server created")
+	self.log("Server created")
 	return Error.OK
 
 ## Creates client
@@ -42,7 +42,7 @@ func create_client(ip: String = DEFAULT_IP, port: int = DEFAULT_PORT) -> Error:
 	if error:
 		return error
 	multiplayer.multiplayer_peer = peer
-	print("Client created")
+	self.log("Client created")
 	return Error.OK
 
 
@@ -101,3 +101,7 @@ func _on_connected_failed():
 func _on_server_disconnected():
 	terminate()
 	server_disconnected.emit()
+
+
+func log(msg: String):
+	print("[%d] %s" % [my_player_data.id if my_player_data else -1, msg])
