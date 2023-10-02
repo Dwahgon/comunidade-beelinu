@@ -1,11 +1,13 @@
 extends Node2D
 
+var main_menu_scene = load("res://levels/main_menu/main_menu.tscn")
 var player_scene = preload("res://characters/player.tscn")
 @onready var players_node = $Players
 
 func _ready():
 	MultiplayerManager.player_connected.connect(_on_player_connected)
 	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
+	MultiplayerManager.server_disconnected.connect(_on_server_disconnected)
 
 
 func _create_player_character(player_data: NetworkPlayerData):
@@ -18,6 +20,9 @@ func _create_player_character(player_data: NetworkPlayerData):
 	return player
 
 
+func _on_server_disconnected():
+	get_tree().change_scene_to_packed(main_menu_scene)
+
 func _on_player_connected(player_data: NetworkPlayerData):
 	MultiplayerManager.log("%d connected. Creating player node." % player_data.id)
 	_create_player_character(player_data)
@@ -25,6 +30,6 @@ func _on_player_connected(player_data: NetworkPlayerData):
 
 func _on_player_disconnected(player_id: int):
 	MultiplayerManager.log("%d disconnected. Removing player node." % player_id)
-	var player_node = players_node.get_node(str(player_id))
-	if player_node:
-		player_node.queue_free()
+	var player_id_str = str(player_id)
+	if players_node.has_node(player_id_str):
+		players_node.get_node(player_id_str).queue_free()
