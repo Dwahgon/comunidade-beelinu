@@ -16,7 +16,7 @@ func _create_player_character(player_data: NetworkPlayerData):
 	players_node.add_child(player)
 	player.get_node('PlayerController').player_data = player_data
 	player.global_position = player_data.position
-	MultiplayerManager.log("Player node %d created" % player_data.id)
+	MultiplayerManager.multiplayer_log("Game", "Player node %d created" % player_data.id)
 	return player
 
 
@@ -24,12 +24,12 @@ func _on_server_disconnected():
 	get_tree().change_scene_to_packed(main_menu_scene)
 
 func _on_player_connected(player_data: NetworkPlayerData):
-	MultiplayerManager.log("%d connected. Creating player node." % player_data.id)
+	MultiplayerManager.multiplayer_log("Game", "%d connected. Creating player node." % player_data.id)
 	_create_player_character(player_data)
 
 
 func _on_player_disconnected(player_id: int):
-	MultiplayerManager.log("%d disconnected. Removing player node." % player_id)
+	MultiplayerManager.multiplayer_log("Game", "%d disconnected. Removing player node." % player_id)
 	var player_id_str = str(player_id)
 	if players_node.has_node(player_id_str):
 		players_node.get_node(player_id_str).queue_free()
