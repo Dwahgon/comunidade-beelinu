@@ -1,8 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://bbxsp6pnhykmc"]
+[gd_scene load_steps=3 format=3 uid="uid://bbxsp6pnhykmc"]
 
 [ext_resource type="Script" path="res://levels/game.gd" id="1_rau8i"]
+[ext_resource type="PackedScene" uid="uid://csf52ob7gob2c" path="res://ui/chat.tscn" id="2_qtdk7"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_rau8i")
 
 [node name="Players" type="Node2D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Chat" parent="UI" instance=ExtResource("2_qtdk7")]

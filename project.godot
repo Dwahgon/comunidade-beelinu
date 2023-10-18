@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 MultiplayerManager="*res://autoloads/multiplayer_manager.gd"
+ChatService="*res://autoloads/chat_service.gd"
 
 [rendering]
 

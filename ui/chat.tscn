@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://csf52ob7gob2c"]
+
+[ext_resource type="Script" path="res://ui/chat.gd" id="1_odmod"]
+
+[node name="Chat" type="VBoxContainer"]
+offset_right = 300.0
+offset_bottom = 150.0
+script = ExtResource("1_odmod")
+
+[node name="ChatBox" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MessageScroll" type="ScrollContainer" parent="ChatBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MessageList" type="VBoxContainer" parent="ChatBox/MessageScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ChatInput" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="MessageInput" type="TextEdit" parent="ChatInput"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Send" type="Button" parent="ChatInput"]
+layout_mode = 2
+text = "Enviar"
+
+[connection signal="pressed" from="ChatInput/Send" to="." method="_on_send_pressed"]
