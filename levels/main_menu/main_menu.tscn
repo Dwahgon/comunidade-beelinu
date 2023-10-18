@@ -46,6 +46,11 @@ script = ExtResource("2_pqkyj")
 layout_mode = 2
 text = "Entrar Servidor"
 
+[node name="Name" type="TextEdit" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
+layout_mode = 2
+placeholder_text = "Nome"
+scroll_fit_content_height = true
+
 [node name="IP" type="TextEdit" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
 layout_mode = 2
 placeholder_text = "IP"

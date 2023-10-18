@@ -38,12 +38,14 @@ func create_server(port: int = DEFAULT_PORT) -> Error:
 	return Error.OK
 
 ## Creates client
-func create_client(ip: String = DEFAULT_IP, port: int = DEFAULT_PORT) -> Error:
+func create_client(player_name: String, ip: String = DEFAULT_IP, port: int = DEFAULT_PORT) -> Error:
 	var peer = ENetMultiplayerPeer.new()
 	var error: Error = peer.create_client(ip, port)
 	if error:
 		return error
 	multiplayer.multiplayer_peer = peer
+	my_player_data = NetworkPlayerData.new(0)
+	my_player_data.name = player_name
 	multiplayer_log("MultiplayerManager", "Client created")
 	return Error.OK
 
@@ -93,7 +95,7 @@ func _on_peer_disconnected(id: int):
 	
 
 func _on_connected_to_server():
-	my_player_data = NetworkPlayerData.new(multiplayer.get_unique_id())
+	my_player_data.id = multiplayer.get_unique_id()
 	players[my_player_data.id] = my_player_data
 	connection_success.emit()
 	player_connected.emit(my_player_data)

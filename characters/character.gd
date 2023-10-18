@@ -4,6 +4,10 @@ extends CharacterBody2D
 
 var _move_direction := Vector2.ZERO
 var _move_distance := 0.0
+var player_name: String : 
+	set(v):
+		player_name = v
+		$Name.text = v
 
 
 func _physics_process(delta: float) -> void:

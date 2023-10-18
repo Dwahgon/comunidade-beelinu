@@ -15,6 +15,7 @@ func _ready():
 func _create_player_character(player_data: NetworkPlayerData):
 	var player = player_scene.instantiate()
 	player.name = str(player_data.id)
+	player.player_name = player_data.name
 	players_node.add_child(player)
 	player.get_node('PlayerController').player_data = player_data
 	player.global_position = player_data.position
