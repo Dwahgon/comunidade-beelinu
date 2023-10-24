@@ -27,13 +27,15 @@ func _ready():
 	_set_env_data()
 	_connect_signals()
 
-func create_server(port: int = DEFAULT_PORT) -> Error:
+func create_server(player_name: String, port: int = DEFAULT_PORT) -> Error:
 	var peer = ENetMultiplayerPeer.new()
 	var error: Error = peer.create_server(port, MAX_PLAYERS)
 	if error:
 		return error
 	multiplayer.multiplayer_peer = peer
 	my_player_data = NetworkPlayerData.new(1)
+	my_player_data.name = player_name
+	players[my_player_data.id] = my_player_data
 	multiplayer_log("MultiplayerManager", "Server created")
 	return Error.OK
 
@@ -85,8 +87,7 @@ func _register_player(new_player_data_dict: Dictionary) -> void:
 
 # A player has joined, send our player data to him
 func _on_peer_connected(id: int):
-	if not multiplayer.is_server():
-		_register_player.rpc_id(id, inst_to_dict(my_player_data))
+	_register_player.rpc_id(id, inst_to_dict(my_player_data))
 
 
 func _on_peer_disconnected(id: int):

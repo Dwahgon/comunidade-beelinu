@@ -6,8 +6,6 @@ extends VBoxContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	if multiplayer.is_server():
-		queue_free() # Delete chat box for server
 	ChatService.message_received.connect(_on_message_received)
 
 

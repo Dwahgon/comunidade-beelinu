@@ -1,74 +1,82 @@
-[gd_scene load_steps=3 format=3 uid="uid://dw83j2xbi1wcv"]
+[gd_scene load_steps=2 format=3 uid="uid://dw83j2xbi1wcv"]
 
-[ext_resource type="Script" path="res://levels/main_menu/create_server_panel.gd" id="1_qjqwm"]
-[ext_resource type="Script" path="res://levels/main_menu/join_server_panel.gd" id="2_pqkyj"]
+[ext_resource type="Script" path="res://levels/main_menu/menu.gd" id="1_xhivv"]
 
 [node name="MainMenu" type="CanvasLayer"]
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="Menu" type="CenterContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_xhivv")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(400, 0)
+[node name="VBoxContainer" type="VBoxContainer" parent="Menu"]
 layout_mode = 2
 
-[node name="CreateServerPanel" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("1_qjqwm")
-
-[node name="Label" type="Label" parent="CenterContainer/HBoxContainer/CreateServerPanel"]
-layout_mode = 2
-text = "Criar Servidor"
-
-[node name="Submit" type="Button" parent="CenterContainer/HBoxContainer/CreateServerPanel"]
-layout_mode = 2
-text = "Criar"
-
-[node name="Error" type="Label" parent="CenterContainer/HBoxContainer/CreateServerPanel"]
-modulate = Color(1, 0.101961, 0.101961, 1)
-layout_mode = 2
-autowrap_mode = 2
-
-[node name="VSeparator" type="VSeparator" parent="CenterContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="JoinServerPanel" type="VBoxContainer" parent="CenterContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("2_pqkyj")
-
-[node name="Label" type="Label" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
-layout_mode = 2
-text = "Entrar Servidor"
-
-[node name="Name" type="TextEdit" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
+[node name="Name" type="TextEdit" parent="Menu/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Nome"
 scroll_fit_content_height = true
 
-[node name="IP" type="TextEdit" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Menu/VBoxContainer"]
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
-placeholder_text = "IP"
-scroll_fit_content_height = true
 
-[node name="Port" type="TextEdit" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
+[node name="CreateServerPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-placeholder_text = "Porta"
-scroll_fit_content_height = true
+size_flags_horizontal = 3
 
-[node name="Submit" type="Button" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
+[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateServerPanel"]
 layout_mode = 2
-text = "Entrar"
+text = "Criar Servidor"
 
-[node name="Message" type="Label" parent="CenterContainer/HBoxContainer/JoinServerPanel"]
+[node name="ServerSubmit" type="Button" parent="Menu/VBoxContainer/HBoxContainer/CreateServerPanel"]
+layout_mode = 2
+text = "Criar"
+
+[node name="ServerMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateServerPanel"]
+unique_name_in_owner = true
 modulate = Color(1, 0.101961, 0.101961, 1)
 layout_mode = 2
 autowrap_mode = 2
 
-[connection signal="pressed" from="CenterContainer/HBoxContainer/CreateServerPanel/Submit" to="CenterContainer/HBoxContainer/CreateServerPanel" method="_on_submit_pressed"]
-[connection signal="pressed" from="CenterContainer/HBoxContainer/JoinServerPanel/Submit" to="CenterContainer/HBoxContainer/JoinServerPanel" method="_on_submit_pressed"]
+[node name="VSeparator" type="VSeparator" parent="Menu/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="JoinServerPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+layout_mode = 2
+text = "Entrar Servidor"
+
+[node name="IP" type="TextEdit" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "127.0.0.1"
+placeholder_text = "IP"
+scroll_fit_content_height = true
+
+[node name="Port" type="TextEdit" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "8335"
+placeholder_text = "Porta"
+scroll_fit_content_height = true
+
+[node name="ClientSubmit" type="Button" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+layout_mode = 2
+text = "Entrar"
+
+[node name="ClientMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+unique_name_in_owner = true
+modulate = Color(1, 0.101961, 0.101961, 1)
+layout_mode = 2
+autowrap_mode = 2
+
+[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/CreateServerPanel/ServerSubmit" to="Menu" method="_on_server_submit_pressed"]
+[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/JoinServerPanel/ClientSubmit" to="Menu" method="_on_client_submit_pressed"]
