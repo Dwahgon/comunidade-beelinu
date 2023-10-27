@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 MultiplayerManager="*res://autoloads/multiplayer_manager.gd"
 ChatService="*res://autoloads/chat_service.gd"
+SignalingServer="*res://autoloads/signaling_server.gd"
 
 [rendering]
 

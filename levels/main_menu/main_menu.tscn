@@ -25,19 +25,19 @@ scroll_fit_content_height = true
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 
-[node name="CreateServerPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
+[node name="CreateRoomPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateServerPanel"]
+[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel"]
 layout_mode = 2
-text = "Criar Servidor"
+text = "Criar Sala"
 
-[node name="ServerSubmit" type="Button" parent="Menu/VBoxContainer/HBoxContainer/CreateServerPanel"]
+[node name="CreateRoomSubmit" type="Button" parent="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel"]
 layout_mode = 2
 text = "Criar"
 
-[node name="ServerMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateServerPanel"]
+[node name="CreateRoomMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel"]
 unique_name_in_owner = true
 modulate = Color(1, 0.101961, 0.101961, 1)
 layout_mode = 2
@@ -46,37 +46,34 @@ autowrap_mode = 2
 [node name="VSeparator" type="VSeparator" parent="Menu/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 
-[node name="JoinServerPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
+[node name="JoinRoomPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel"]
 layout_mode = 2
-text = "Entrar Servidor"
 
-[node name="IP" type="TextEdit" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Entrar em uma Sala"
+
+[node name="ReloadRoomList" type="Button" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/HBoxContainer"]
+layout_mode = 2
+text = "↻"
+
+[node name="RoomListScroll" type="ScrollContainer" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="RoomList" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/RoomListScroll"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "127.0.0.1"
-placeholder_text = "IP"
-scroll_fit_content_height = true
+size_flags_horizontal = 3
 
-[node name="Port" type="TextEdit" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
+[node name="JoinRoomMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "8335"
-placeholder_text = "Porta"
-scroll_fit_content_height = true
 
-[node name="ClientSubmit" type="Button" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
-layout_mode = 2
-text = "Entrar"
-
-[node name="ClientMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinServerPanel"]
-unique_name_in_owner = true
-modulate = Color(1, 0.101961, 0.101961, 1)
-layout_mode = 2
-autowrap_mode = 2
-
-[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/CreateServerPanel/ServerSubmit" to="Menu" method="_on_server_submit_pressed"]
-[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/JoinServerPanel/ClientSubmit" to="Menu" method="_on_client_submit_pressed"]
+[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel/CreateRoomSubmit" to="Menu" method="_on_create_room_submit_pressed"]
+[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/HBoxContainer/ReloadRoomList" to="Menu" method="_on_reload_room_list_pressed"]
