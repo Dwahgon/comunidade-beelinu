@@ -25,6 +25,7 @@ signal connection_success
 
 func _ready():
 	_connect_signals()
+	_init_election_timer()
 	get_tree().auto_accept_quit = false
 
 
@@ -46,19 +47,8 @@ func _connect_to_host(host_ip: String, host_port: int, host_id: int):
 	multiplayer_log("MultiplayerManager", 'Connecting to host id %d on %s:%d' % [host_id, host_ip, host_port])
 
 
-func start_room(player_name: String) -> Error:
-	var error := Error.OK
-	my_id = 1
-	next_player_id = 2
-	
-	# Create mesh peer
-	var peer = ENetMultiplayerPeer.new()
-	error = peer.create_mesh(my_id)
-	if error:
-		return error
-	
-	# Request server creation in signaling server
-	error = SignalingServer.post_room(next_player_id, my_id)
+func _request_post_room():
+	var error = SignalingServer.post_room(next_player_id, my_id)
 	if error:
 		return error
 	
@@ -71,10 +61,29 @@ func start_room(player_name: String) -> Error:
 		return res[1]
 	room_id = int(JSON.parse_string(res[3].get_string_from_utf8()))
 	
+	return error
+
+
+func start_room(player_name: String) -> Error:
+	var error := Error.OK
+	my_id = 1
+	next_player_id = 2
+	
+	# Create mesh peer
+	var peer = ENetMultiplayerPeer.new()
+	error = peer.create_mesh(my_id)
+	if error:
+		return error
+	
+	# Request server creation in signaling server
+	error = await _request_post_room()
+	if error:
+		return error
+		
 	# Initialize peer
 	multiplayer.multiplayer_peer = peer
 	authority_id = my_id
-	
+
 	# Initialize player data
 	my_player_data = NetworkPlayerData.new(my_id)
 	my_player_data.name = player_name
@@ -207,9 +216,12 @@ func _on_peer_connected(id: int):
 	_register_player.rpc_id(id, inst_to_dict(my_player_data))
 
 
+# A player has left, remove him from player list and start an election if he was the authority
 func _on_peer_disconnected(id: int):
 	players.erase(id)
 	player_disconnected.emit(id)
+	if id == authority_id:
+		_initialize_election()
 
 
 func _on_connected_to_server():
@@ -230,3 +242,62 @@ func _on_server_disconnected():
 
 func multiplayer_log(author: String, msg: String):
 	print("[%d] %s - %s" % [my_id, author, msg])
+
+
+#####################
+## BULLY ALGORITHM ##
+#####################
+
+const ELECTION_TIMEOUT_SEC = 2
+var _election_timer: Timer
+
+# Create timer object
+func _init_election_timer():
+	_election_timer = Timer.new()
+	_election_timer.name = "ElectionTimer"
+	_election_timer.one_shot = true
+	_election_timer.timeout.connect(_rpc_new_authority)
+	add_child(_election_timer)
+
+# Start an election
+func _initialize_election():
+	# Don't start election if it's already happening
+	if not _election_timer.is_stopped():
+		return
+	
+	multiplayer_log("NetworkManager", "Starting election")
+	# Send election message to all peers and start timer
+	_election.rpc()
+	_election_timer.start(ELECTION_TIMEOUT_SEC)
+
+
+# Call new authority
+func _rpc_new_authority():
+	_new_authority.rpc()
+
+
+# Handle election message
+@rpc("any_peer", "call_remote", "reliable")
+func _election():
+	multiplayer_log("NetworkManager", str(multiplayer.get_remote_sender_id()) + " --E-> " + str(my_id))
+	if my_id < multiplayer.get_remote_sender_id(): # Punch the peer with larger id
+		_punch.rpc_id(multiplayer.get_remote_sender_id())
+		_initialize_election()
+
+# Handle punch message
+@rpc("any_peer", "call_remote", "reliable")
+func _punch():
+	multiplayer_log("NetworkManager", str(multiplayer.get_remote_sender_id()) + " --P-> " + str(my_id))
+	# Stop election timer
+	_election_timer.stop()
+
+
+# Election timer has timeouted, means no peer has punched. We have been elected. Become authority
+@rpc("any_peer", "call_local", "reliable")
+func _new_authority():
+	multiplayer_log("NetworkManager", str(multiplayer.get_remote_sender_id()) + " --A-> " + str(my_id))
+	authority_id = multiplayer.get_remote_sender_id()
+	if my_id == authority_id:
+		var error = await _request_post_room()
+		if error: # Request fail. Disconnect
+			terminate()
