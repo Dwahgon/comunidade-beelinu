@@ -7,10 +7,10 @@ const MAX_PLAYERS := 32
 var players = {}
 ## Stores the current player data
 var my_player_data: NetworkPlayerData = null
-var my_id: int = 0
-var authority_id: int = 0
-var room_id: int = 0
-var next_player_id: int = 0
+var my_id: int = -1
+var authority_id: int = -1
+var room_id: int = -1
+var next_player_id: int = -1
 var host_buffer = {}
 
 
@@ -25,6 +25,7 @@ signal connection_success
 
 func _ready():
 	_connect_signals()
+	get_tree().auto_accept_quit = false
 
 
 func _calculate_next_peer_port(listening_peer: int = my_id, joining_peer: int = next_player_id):
@@ -148,6 +149,13 @@ func _process(_delta):
 		multiplayer.multiplayer_peer.poll()
 
 
+func _notification(what):
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		if my_id == authority_id and room_id >= 0:
+			await terminate()
+		get_tree().quit()
+
+
 @rpc("any_peer", "reliable")
 func _connect_to_other_peers(ips: Dictionary):
 	for id in ips:
@@ -163,6 +171,15 @@ func _create_my_player(player_name: String):
 
 ## Terminates connection
 func terminate() -> void:
+	if my_id == authority_id and room_id >= 0:
+		SignalingServer.delete_room(room_id)
+		await SignalingServer.request_completed
+		
+	my_id = -1
+	authority_id = -1
+	room_id = -1
+	next_player_id = -1
+	
 	multiplayer.multiplayer_peer = null
 	my_player_data = null
 	players.clear()

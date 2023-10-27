@@ -40,3 +40,10 @@ func patch_room(room_id: int, changes: Dictionary):
 		["Content-Type: application/json"], HTTPClient.METHOD_PATCH, 
 		JSON.stringify(changes)
 	)
+
+
+func delete_room(room_id: int):
+	return request(
+		"http://%s:%s/rooms/%d" % [server_ip, server_port, room_id],
+		[], HTTPClient.METHOD_DELETE
+	)
