@@ -6,6 +6,16 @@ const app = express();
 const route = Router();
 let idCounter = 0
 
+function logRequest(req: Request, res: Response, next: NextFunction) {
+    const url = req.url;
+    const method = req.method;
+    console.log(`${method} ${url} - Pending\nBody:${JSON.stringify(req.body, undefined, 2)}`);
+    res.on('finish', () => {
+        console.log(`${method} ${url} - ${res.statusCode}`);
+    });
+    next();
+}
+
 type Room = {
     ip: string,
     nextPlayerId: number,
@@ -14,10 +24,10 @@ type Room = {
 const rooms = new Map<number, Room>();
 
 app.use(express.json());
+app.use(logRequest)
 
 const validateRoomRequest = (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
-    console.log(body)
 
     if (!req.ip) return res.status(403).json('IP must be known');
     if (!body.nextPlayerId) return res.status(400).json(`Missing body property 'nextPlayerId'`)
@@ -57,7 +67,6 @@ route.post('/rooms', validateRoomRequest, (req: Request, res: Response) => {
 
     // Send room id back
     res.status(200).json(idCounter - 1);
-    console.log("Created Room ", idCounter - 1);
 })
 
 route.patch('/rooms/:id', validateRoomId, merge, validateRoomRequest, (req: Request, res: Response) => {
@@ -79,4 +88,4 @@ route.delete('/rooms/:id', validateRoomId, (req: Request, res: Response) => {
 app.use(route)
 
 
-app.listen(port, () => console.log(`room running on port ${port}`));
+app.listen(port, () => console.log(`Room server running on port ${port}`));
