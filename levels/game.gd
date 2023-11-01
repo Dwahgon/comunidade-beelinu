@@ -1,5 +1,6 @@
 extends Node2D
 
+const SPAWN_AREA = Vector4i(30, 30, 1100, 600)
 var main_menu_scene = load("res://levels/main_menu/main_menu.tscn")
 var player_scene = preload("res://characters/player.tscn")
 @onready var players_node = $Players
@@ -27,7 +28,12 @@ func _on_server_disconnected():
 
 func _on_player_connected(player_data: NetworkPlayerData):
 	MultiplayerManager.multiplayer_log("Game", "%d connected. Creating player node." % player_data.id)
-	_create_player_character(player_data)
+	var plr = _create_player_character(player_data)
+	if player_data.id == MultiplayerManager.my_id:
+		plr._set_player_pos.rpc(Vector2(
+			float(SPAWN_AREA.x) + (float(SPAWN_AREA.z) - float(SPAWN_AREA.x)) * randf(), 
+			float(SPAWN_AREA.y) + (float(SPAWN_AREA.w) - float(SPAWN_AREA.y)) * randf()
+		))
 
 
 func _on_player_disconnected(player_data: NetworkPlayerData):
