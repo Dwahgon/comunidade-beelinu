@@ -26,13 +26,31 @@ func _on_join_room_button_clicked(room_data: Dictionary):
 	# Validate name
 	if not _validate_name(join_room_message_label):
 		return
+	
+	if room_data.nextPlayerId == -1:
+		display_message(join_room_message_label, "Sala cheia")
+		return
 
 	# Try to create room
 	var error = MultiplayerManager.join_room(name_input.text, room_data)
 	if error:
 		display_message(join_room_message_label, "Error code %d" % error)
 	else:
-		get_tree().change_scene_to_packed(level_to_load)
+		MultiplayerManager.connection_success.connect(_on_connection_success)
+		MultiplayerManager.connection_failed.connect(_on_connection_failed)
+		display_message(join_room_message_label, "Conectando...", MessageTheme.SUCCESS)
+
+
+func _on_connection_success():
+	MultiplayerManager.connection_success.disconnect(_on_connection_success)
+	MultiplayerManager.connection_failed.disconnect(_on_connection_failed)
+	get_tree().change_scene_to_packed(level_to_load)
+
+
+func _on_connection_failed():
+	MultiplayerManager.connection_success.disconnect(_on_connection_success)
+	MultiplayerManager.connection_failed.disconnect(_on_connection_failed)
+	display_message(join_room_message_label, "Não foi possível se conectar", MessageTheme.ERROR)
 
 
 func _on_reload_room_list_pressed():

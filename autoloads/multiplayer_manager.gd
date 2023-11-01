@@ -1,7 +1,7 @@
 extends Node
 
 const BASE_PORT := 8335
-const MAX_PLAYERS := 32
+const MAX_PLAYERS := 3
 
 ## Stores player data for all of the connected players
 var players = {}
@@ -29,15 +29,28 @@ func _ready():
 	get_tree().auto_accept_quit = false
 
 
+func _compute_next_player_id():
+	var peers = multiplayer.get_peers()
+	if peers.size() == MAX_PLAYERS - 1:
+		return -1
+	var id = max(next_player_id % MAX_PLAYERS + 1, 1)
+	while id == my_id or id in peers:
+		id = id % MAX_PLAYERS + 1
+	return id
+
+
 func _calculate_next_peer_port(listening_peer: int = my_id, joining_peer: int = next_player_id):
 	return BASE_PORT + (listening_peer-1) * MAX_PLAYERS + joining_peer - 2
 
 
 func _listen_to_next_host():
+	if next_player_id == -1:
+		return
 	var port = _calculate_next_peer_port()
 	host_buffer[next_player_id] = ENetConnection.new()
 	host_buffer[next_player_id].create_host_bound("*", port, 1)
 	multiplayer_log("MultiplayerManager", 'Listening on port %d' % port)
+	return true
 
 
 func _connect_to_host(host_ip: String, host_port: int, host_id: int):
@@ -67,23 +80,23 @@ func _request_post_room():
 func start_room(player_name: String) -> Error:
 	var error := Error.OK
 	my_id = 1
-	next_player_id = 2
-	
+	authority_id = my_id
+
 	# Create mesh peer
 	var peer = ENetMultiplayerPeer.new()
 	error = peer.create_mesh(my_id)
 	if error:
+		terminate()
 		return error
+	multiplayer.multiplayer_peer = peer
+	next_player_id = _compute_next_player_id()
 	
 	# Request server creation in signaling server
 	error = await _request_post_room()
 	if error:
+		terminate()
 		return error
 		
-	# Initialize peer
-	multiplayer.multiplayer_peer = peer
-	authority_id = my_id
-
 	# Initialize player data
 	my_player_data = NetworkPlayerData.new(my_id)
 	my_player_data.name = player_name
@@ -100,13 +113,13 @@ func start_room(player_name: String) -> Error:
 func join_room(player_name: String, room_data: Dictionary) -> Error:
 	var error := Error.OK
 	my_id = room_data.nextPlayerId
-	next_player_id = my_id + 1
 	authority_id = room_data.authorityId
 	
 	# Create mesh peer
 	var peer = ENetMultiplayerPeer.new()
 	error = peer.create_mesh(my_id)
 	if error:
+		terminate()
 		return error
 	multiplayer.multiplayer_peer = peer
 	
@@ -124,35 +137,36 @@ func _process(_delta):
 			var host : ENetConnection = host_buffer[host_id]
 			var event = host.service()
 			if event[0] == host.EVENT_CONNECT:
+				# Add host peer
+				multiplayer.multiplayer_peer.add_mesh_peer(host_id, host)
+				
 				# Prepare for next player connection
-				var other_peers_ips = {}
 				if my_id == authority_id: # We are the authority server and a player has connected, give that player the ip and ports of all the other peers, update signaling server data and listen to next player
+					# Update signaling server
+					next_player_id = _compute_next_player_id()
+					SignalingServer.patch_room(room_id, {
+						"nextPlayerId": next_player_id,
+					})
+					
 					# Give the ips of the peers to the new player so he can connect to them
+					var other_peers_ips = {}
 					for peer_id in multiplayer.get_peers():
+						if peer_id == host_id: # Don't send the player his own ip and port
+							continue
 						var peer_conn = multiplayer.multiplayer_peer.get_peer(peer_id)
 						var peer_ip = peer_conn.get_remote_address()
 						var peer_port = _calculate_next_peer_port(peer_id, host_id)
 						other_peers_ips[peer_id] = "%s:%d" % [peer_ip, peer_port]
-					
-					# Update signaling server
-					next_player_id += 1
-					SignalingServer.patch_room(room_id, {
-						"nextPlayerId": next_player_id,
-					})
-				elif host_id == next_player_id: # We're not the authority server, but a new player has connected. Increment next_player_id to listen to next player
-					next_player_id += 1
+					_connect_to_other_peers.rpc_id(host_id, other_peers_ips, next_player_id)
+				if host_id == next_player_id: # We're not the authority server, but a new player has connected. Increment next_player_id to listen to next player
+					next_player_id = _compute_next_player_id()
 				_listen_to_next_host()
-				
-				# Add host peer
-				multiplayer.multiplayer_peer.add_mesh_peer(host_id, host)
-				
-				# Send to new player the ips of other players so he can connect to them
-				if my_id == authority_id:
-					_connect_to_other_peers.rpc_id(host_id, other_peers_ips)
 				
 				host_buffer.erase(host_id)
 				multiplayer_log("MultiplayerManager", "Connected to host %d" % host_id)
 			elif event[0] != host.EVENT_NONE:
+				if host_id == authority_id: # Failed to connect to authority, throw connection error
+					connection_failed.emit()
 				host_buffer.erase(host_id)
 				multiplayer_log("MultiplayerManager", "Host %d failed: %d" % [host_id, event[0]])
 		multiplayer.multiplayer_peer.poll()
@@ -166,10 +180,15 @@ func _notification(what):
 
 
 @rpc("any_peer", "reliable")
-func _connect_to_other_peers(ips: Dictionary):
+func _connect_to_other_peers(ips: Dictionary, next_id: int):
+	# Connect to other peers
 	for id in ips:
 		var ip_port = ips[id].split(":")
 		_connect_to_host(ip_port[0], int(ip_port[1]), id)
+	
+	# Listen for the next player
+	next_player_id = next_id
+	_listen_to_next_host()
 
 
 func _create_my_player(player_name: String):
@@ -220,6 +239,13 @@ func _on_peer_connected(id: int):
 func _on_peer_disconnected(id: int):
 	players.erase(id)
 	player_disconnected.emit(id)
+
+	# We've reached max players and a player left, start listening to that port
+	if next_player_id == -1:
+		next_player_id = _compute_next_player_id()
+		_listen_to_next_host()
+	
+	# The peer that left was the authority, start an election
 	if id == authority_id:
 		_initialize_election()
 

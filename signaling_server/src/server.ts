@@ -32,7 +32,7 @@ const validateRoomRequest = (req: Request, res: Response, next: NextFunction) =>
     if (!req.ip) return res.status(403).json('IP must be known');
     if (!body.nextPlayerId) return res.status(400).json(`Missing body property 'nextPlayerId'`)
     if (typeof body.nextPlayerId != 'number') return res.status(400).json(`nextPlayerId must be a number`);
-    if (body.nextPlayerId < 0) return res.status(400).json(`nextPlayerId must be positive`);
+    if (body.nextPlayerId < -1) return res.status(400).json(`nextPlayerId must be greater or equal to -1`);
     if (!body.authorityId) return res.status(400).json(`Missing body property 'authorityId'`)
     if (typeof body.authorityId != 'number') return res.status(400).json(`authorityId must be a number`);
     if (body.authorityId < 0) return res.status(400).json(`authorityId must be positive`);
