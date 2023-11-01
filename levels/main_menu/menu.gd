@@ -96,7 +96,7 @@ func _on_reload_room_list_pressed():
 	# Add room buttons
 	for room_id in room_data:
 		var button = Button.new()
-		button.text = str(room_id)
+		button.text = "Sala " + str(room_id)
 		button.pressed.connect(_on_join_room_button_clicked.bind(int(room_id)))
 		room_list.add_child(button)
 	
