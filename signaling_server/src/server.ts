@@ -1,8 +1,8 @@
 import express, { NextFunction } from 'express'
 import { Router, Request, Response } from 'express';
 
-const roomTimeoutMs = 30 * 1000
-const port = 8080;
+const roomTimeoutMs = parseInt(process.env.ROOM_TIMEOUT_MS || '') || 30 * 1000
+const port = parseInt(process.env.ROOM_SERVER_PORT || '8080');
 const app = express();
 const route = Router();
 let idCounter = 0

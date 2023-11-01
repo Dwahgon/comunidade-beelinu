@@ -1,14 +1,21 @@
 extends HTTPRequest
 
+const DEFAULT_ROOM_SERVER_IP := "127.0.0.1"
+const DEFAULT_ROOM_SERVER_PORT := 8080
 
 # Signaling server comunication
 var http_request: HTTPRequest
-var server_ip = "127.0.0.1"
-var server_port = 8080
+var server_ip := "127.0.0.1"
+var server_port := 8080
 
 
 func _ready():
 	request_completed.connect(_log_request_response)
+	
+	server_ip = OS.get_environment("ROOM_SERVER_IP")
+	server_ip = server_ip if not server_ip.is_empty() else DEFAULT_ROOM_SERVER_IP
+	server_port = int(OS.get_environment("ROOM_SERVER_PORT"))
+	server_port = server_port if server_port > 0 else DEFAULT_ROOM_SERVER_PORT
 
 
 func _log_request_response(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):

@@ -1,8 +1,9 @@
 extends Node
 
 const BASE_PORT := 8335
-const MAX_PLAYERS := 3
+const MAX_PLAYERS := 32
 const KEEP_ALIVE_TIMEOUT_SEC := 15
+const ELECTION_TIMEOUT_SEC = 2
 
 ## Stores player data for all of the connected players
 var players = {}
@@ -48,8 +49,6 @@ func _calculate_next_peer_port(listening_peer: int = my_id, joining_peer: int = 
 func _listen_to_next_host():
 	if next_player_id == -1:
 		return
-#	if next_peer_id in multiplayer.get_peers():
-#		multiplayer.multiplayer_peer.add_mesh_peer(host_id, host)
 		
 	var port = _calculate_next_peer_port()
 	host_buffer[next_player_id] = ENetConnection.new()
@@ -296,7 +295,6 @@ func _init_keep_alive_timer():
 ## BULLY ALGORITHM ##
 #####################
 
-const ELECTION_TIMEOUT_SEC = 2
 var _election_timer: Timer
 
 # Create timer object
