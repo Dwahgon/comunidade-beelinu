@@ -50,6 +50,13 @@ func patch_room(room_id: int, changes: Dictionary):
 	)
 
 
+func patch_keep_alive_room(room_id: int):
+	return request(
+		"http://%s:%s/rooms/%d/keep-alive" % [server_ip, server_port, room_id], 
+		["Content-Type: application/json"], HTTPClient.METHOD_PATCH,
+	)
+
+
 func delete_room(room_id: int):
 	return request(
 		"http://%s:%s/rooms/%d" % [server_ip, server_port, room_id],

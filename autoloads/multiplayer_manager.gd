@@ -2,6 +2,7 @@ extends Node
 
 const BASE_PORT := 8335
 const MAX_PLAYERS := 3
+const KEEP_ALIVE_TIMEOUT_SEC := 15
 
 ## Stores player data for all of the connected players
 var players = {}
@@ -26,6 +27,7 @@ signal connection_success
 func _ready():
 	_connect_signals()
 	_init_election_timer()
+	_init_keep_alive_timer()
 	get_tree().auto_accept_quit = false
 
 
@@ -280,6 +282,15 @@ func _on_server_disconnected():
 func multiplayer_log(author: String, msg: String):
 	print("[%d] %s - %s" % [my_id, author, msg])
 
+func _init_keep_alive_timer():
+	var timer := Timer.new()
+	add_child(timer)
+	timer.one_shot = false # Keep repeating
+	timer.start(KEEP_ALIVE_TIMEOUT_SEC)
+	timer.timeout.connect(func(): 
+		if my_id != -1 and authority_id == my_id:
+			SignalingServer.patch_keep_alive_room(room_id)
+	)
 
 #####################
 ## BULLY ALGORITHM ##
@@ -338,3 +349,10 @@ func _new_authority():
 		var error = await _request_post_room()
 		if error: # Request fail. Disconnect
 			terminate()
+		_set_room_id.rpc(room_id)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _set_room_id(new_room_id: int):
+	if multiplayer.get_remote_sender_id() == authority_id:
+		room_id = new_room_id

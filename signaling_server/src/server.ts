@@ -1,6 +1,7 @@
 import express, { NextFunction } from 'express'
 import { Router, Request, Response } from 'express';
 
+const roomTimeoutMs = 30 * 1000
 const port = 8080;
 const app = express();
 const route = Router();
@@ -22,9 +23,18 @@ type Room = {
     authorityId: number,
 }
 const rooms = new Map<number, Room>();
+const removeRoomTimeout = new Map<number, NodeJS.Timeout>();
 
 app.use(express.json());
 app.use(logRequest)
+
+
+function updateRoomTimeout(roomId: number) {
+    if (removeRoomTimeout.has(roomId))
+        clearTimeout(removeRoomTimeout.get(roomId));
+    removeRoomTimeout.set(roomId, setTimeout(() => (rooms.delete(roomId), console.log(`Removed ${roomId}`)), roomTimeoutMs));
+}
+
 
 const validateRoomRequest = (req: Request, res: Response, next: NextFunction) => {
     const body = req.body;
@@ -69,6 +79,8 @@ route.post('/rooms', validateRoomRequest, (req: Request, res: Response) => {
         authorityId: body.authorityId,
     });
 
+    updateRoomTimeout(idCounter - 1);
+
     // Send room id back
     res.status(200).json(idCounter - 1);
 })
@@ -81,11 +93,23 @@ route.patch('/rooms/:id', validateRoomId, merge, validateRoomRequest, (req: Requ
         nextPlayerId: body.nextPlayerId,
         authorityId: body.authorityId,
     });
+
+    updateRoomTimeout(parseInt(req.params.id));
+
     res.status(200).json();
 });
 
+route.patch('/rooms/:id/keep-alive', validateRoomId, (req: Request, res: Response) => {
+    // Send room id back
+    updateRoomTimeout(parseInt(req.params.id));
+    res.status(200).json();
+})
+
 route.delete('/rooms/:id', validateRoomId, (req: Request, res: Response) => {
-    rooms.delete(parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    rooms.delete(id);
+    clearTimeout(removeRoomTimeout.get(id));
+    removeRoomTimeout.delete(id);
     res.status(200).json();
 })
 
