@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dc4f87svis074"]
 
 [ext_resource type="PackedScene" uid="uid://bwrld30e1wbgj" path="res://characters/character.tscn" id="1_84vmf"]
-[ext_resource type="Texture2D" uid="uid://b48w4nh3btiq2" path="res://icon.svg" id="2_na7vq"]
+[ext_resource type="Texture2D" uid="uid://qvhmbpmunmal" path="res://characters/beelinu.png" id="2_iquh3"]
 [ext_resource type="Script" path="res://characters/player_controller.gd" id="3_4ukyr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pksin"]
@@ -13,7 +13,9 @@ size = Vector2(128, 128)
 shape = SubResource("RectangleShape2D_pksin")
 
 [node name="Sprite" parent="." index="1"]
-texture = ExtResource("2_na7vq")
+position = Vector2(2.38419e-07, -2.38419e-07)
+scale = Vector2(8, 8)
+texture = ExtResource("2_iquh3")
 
 [node name="PlayerController" type="Node2D" parent="." index="2"]
 script = ExtResource("3_4ukyr")
