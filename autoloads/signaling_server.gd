@@ -34,6 +34,14 @@ func get_rooms() -> Error:
 	)
 
 
+func get_room(room_id: int) -> Error:
+	return request(
+		"http://%s:%s/rooms/%d" % [server_ip, server_port, room_id], 
+		PackedStringArray(), HTTPClient.METHOD_GET
+	)
+
+
+
 func patch_room(room_id: int, changes: Dictionary):
 	return request(
 		"http://%s:%s/rooms/%d" % [server_ip, server_port, room_id], 

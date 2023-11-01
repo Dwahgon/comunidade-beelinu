@@ -54,6 +54,10 @@ route.get('/rooms', (req: Request, res: Response) => {
     res.status(200).json(Object.fromEntries(rooms));
 })
 
+route.get('/rooms/:id', validateRoomId, (req: Request, res: Response) => {
+    res.status(200).json(rooms.get(parseInt(req.params.id)));
+})
+
 route.post('/rooms', validateRoomRequest, (req: Request, res: Response) => {
     // Parse body
     const body = req.body;

@@ -22,22 +22,39 @@ func _on_create_room_submit_pressed():
 		get_tree().change_scene_to_packed(level_to_load)
 
 
-func _on_join_room_button_clicked(room_data: Dictionary):
+func _on_join_room_button_clicked(room_id: int):
 	# Validate name
 	if not _validate_name(join_room_message_label):
 		return
 	
+	display_message(join_room_message_label, "Pegando dados da sala...", MessageTheme.NORMAL)
+	# Get updated room data
+	var error = SignalingServer.get_room(room_id)
+	if error:
+		display_message(join_room_message_label, "Error code %d" % error)
+		return
+
+	# Process response
+	var res = await SignalingServer.request_completed
+	if not res[1] == 200:
+		display_message(join_room_message_label, "Error code %d" % res[1])
+		return
+	var room_data: Dictionary = JSON.parse_string(res[3].get_string_from_utf8())
+	
+	# Throw error if room is full
 	if room_data.nextPlayerId == -1:
 		display_message(join_room_message_label, "Sala cheia")
 		return
-
-	# Try to create room
-	var error = MultiplayerManager.join_room(name_input.text, room_data)
+	
+	# Try to join room
+	MultiplayerManager.connection_success.connect(_on_connection_success)
+	MultiplayerManager.connection_failed.connect(_on_connection_failed)
+	error = MultiplayerManager.join_room(name_input.text, room_data)
 	if error:
+		MultiplayerManager.connection_success.disconnect(_on_connection_success)
+		MultiplayerManager.connection_failed.disconnect(_on_connection_failed)
 		display_message(join_room_message_label, "Error code %d" % error)
 	else:
-		MultiplayerManager.connection_success.connect(_on_connection_success)
-		MultiplayerManager.connection_failed.connect(_on_connection_failed)
 		display_message(join_room_message_label, "Conectando...", MessageTheme.SUCCESS)
 
 
@@ -80,7 +97,7 @@ func _on_reload_room_list_pressed():
 	for room_id in room_data:
 		var button = Button.new()
 		button.text = str(room_id)
-		button.pressed.connect(_on_join_room_button_clicked.bind(room_data[room_id]))
+		button.pressed.connect(_on_join_room_button_clicked.bind(int(room_id)))
 		room_list.add_child(button)
 	
 	display_message(join_room_message_label, "")

@@ -46,6 +46,9 @@ func _calculate_next_peer_port(listening_peer: int = my_id, joining_peer: int = 
 func _listen_to_next_host():
 	if next_player_id == -1:
 		return
+#	if next_peer_id in multiplayer.get_peers():
+#		multiplayer.multiplayer_peer.add_mesh_peer(host_id, host)
+		
 	var port = _calculate_next_peer_port()
 	host_buffer[next_player_id] = ENetConnection.new()
 	host_buffer[next_player_id].create_host_bound("*", port, 1)
@@ -160,15 +163,22 @@ func _process(_delta):
 					_connect_to_other_peers.rpc_id(host_id, other_peers_ips, next_player_id)
 				if host_id == next_player_id: # We're not the authority server, but a new player has connected. Increment next_player_id to listen to next player
 					next_player_id = _compute_next_player_id()
+				if host_id == authority_id: # We've connected to the authority server, emit connection success signal
+					connection_success.emit()
+
 				_listen_to_next_host()
 				
 				host_buffer.erase(host_id)
 				multiplayer_log("MultiplayerManager", "Connected to host %d" % host_id)
 			elif event[0] != host.EVENT_NONE:
+				multiplayer_log("MultiplayerManager", "Host %d failed: %d" % [host_id, event[0]])
 				if host_id == authority_id: # Failed to connect to authority, throw connection error
 					connection_failed.emit()
-				host_buffer.erase(host_id)
-				multiplayer_log("MultiplayerManager", "Host %d failed: %d" % [host_id, event[0]])
+				# Fix a bug
+				if event[0] == -1:
+					_listen_to_next_host()
+				else:
+					host_buffer.erase(host_id)
 		multiplayer.multiplayer_peer.poll()
 
 
@@ -216,7 +226,6 @@ func terminate() -> void:
 func _connect_signals() -> void:
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
-	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connected_failed)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 
@@ -242,16 +251,18 @@ func _on_peer_disconnected(id: int):
 
 	# We've reached max players and a player left, start listening to that port
 	if next_player_id == -1:
+		print("disconnected")
 		next_player_id = _compute_next_player_id()
 		_listen_to_next_host()
+		# Update signaling server
+		if my_id == authority_id:
+			SignalingServer.patch_room(room_id, {
+				"nextPlayerId": next_player_id,
+			})
 	
 	# The peer that left was the authority, start an election
 	if id == authority_id:
 		_initialize_election()
-
-
-func _on_connected_to_server():
-	connection_success.emit()
 
 
 func _on_connected_failed():
