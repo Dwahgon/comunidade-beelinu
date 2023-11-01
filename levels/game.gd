@@ -30,8 +30,8 @@ func _on_player_connected(player_data: NetworkPlayerData):
 	_create_player_character(player_data)
 
 
-func _on_player_disconnected(player_id: int):
-	MultiplayerManager.multiplayer_log("Game", "%d disconnected. Removing player node." % player_id)
-	var player_id_str = str(player_id)
+func _on_player_disconnected(player_data: NetworkPlayerData):
+	MultiplayerManager.multiplayer_log("Game", "%d disconnected. Removing player node." % player_data.id)
+	var player_id_str = str(player_data.id)
 	if players_node.has_node(player_id_str):
 		players_node.get_node(player_id_str).queue_free()

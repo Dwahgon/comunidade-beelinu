@@ -7,13 +7,18 @@ extends VBoxContainer
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	ChatService.message_received.connect(_on_message_received)
+	MultiplayerManager.player_connected.connect(_on_player_connected)
+	MultiplayerManager.player_disconnected.connect(_on_player_disconnected)
 
 
 func _create_new_message(author: String, message: String):
 	var message_label = RichTextLabel.new()
 	message_label.bbcode_enabled = true
 	message_label.fit_content = true
-	message_label.text = "[color=#FF0000]%s[/color]: %s" % [author, message]
+	if author.is_empty():
+		message_label.text = "[color=#FFFF00]%s[/color]" % [message]
+	else:
+		message_label.text = "[color=#FF0000]%s[/color]: %s" % [author, message]
 	message_list.add_child(message_label)
 
 
@@ -29,3 +34,11 @@ func _on_send_pressed():
 		return
 	ChatService.send_message.rpc(message_input.text)
 	message_input.text = ""
+
+
+func _on_player_connected(data: NetworkPlayerData):
+	_create_new_message("", data.name + " entrou na sala!")
+
+
+func _on_player_disconnected(data: NetworkPlayerData):
+	_create_new_message("", data.name + " saiu da sala.")

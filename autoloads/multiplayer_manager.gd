@@ -19,7 +19,7 @@ var host_buffer = {}
 ## Fires when a network peer has connected
 signal player_connected(network_player)
 ## Fires when a network peer has disconnected
-signal player_disconnected(id)
+signal player_disconnected(network_player)
 ## Fires when we disconnect from server
 signal server_disconnected
 signal connection_failed
@@ -247,8 +247,8 @@ func _on_peer_connected(id: int):
 
 # A player has left, remove him from player list and start an election if he was the authority
 func _on_peer_disconnected(id: int):
+	player_disconnected.emit(players[id])
 	players.erase(id)
-	player_disconnected.emit(id)
 
 	# We've reached max players and a player left, start listening to that port
 	if next_player_id == -1:
