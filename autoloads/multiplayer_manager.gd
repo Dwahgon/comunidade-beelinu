@@ -3,7 +3,8 @@ extends Node
 const BASE_PORT := 8335
 const MAX_PLAYERS := 32
 const KEEP_ALIVE_TIMEOUT_SEC := 15
-const ELECTION_TIMEOUT_SEC = 2
+const ELECTION_TIMEOUT_SEC := 2
+const RETRY_CREATE_ROOM_SEC := 2
 
 ## Stores player data for all of the connected players
 var players = {}
@@ -345,8 +346,10 @@ func _new_authority():
 	authority_id = multiplayer.get_remote_sender_id()
 	if my_id == authority_id:
 		var error = await _request_post_room()
-		if error: # Request fail. Disconnect
-			terminate()
+		while error:
+			multiplayer_log("MultiplayerManager", "Couldn't recreate room, trying again in %d seconds.." % RETRY_CREATE_ROOM_SEC)
+			await get_tree().create_timer(RETRY_CREATE_ROOM_SEC).timeout
+			error = await _request_post_room()
 		_set_room_id.rpc(room_id)
 
 

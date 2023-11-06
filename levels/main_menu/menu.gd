@@ -31,6 +31,7 @@ func _on_join_room_button_clicked(room_id: int):
 	# Get updated room data
 	var error = SignalingServer.get_room(room_id)
 	if error:
+		print("here")
 		display_message(join_room_message_label, "Error code %d" % error)
 		return
 
@@ -80,11 +81,13 @@ func _on_reload_room_list_pressed():
 	var error = SignalingServer.get_rooms()
 	if error:
 		display_message(join_room_message_label, "Error code %d" % error)
+		reloading = false
 		return
 
 	# Process response
 	var res = await SignalingServer.request_completed
 	if not res[1] == 200:
+		reloading = false
 		display_message(join_room_message_label, "Error code %d" % res[1])
 		return
 	var room_data: Dictionary = JSON.parse_string(res[3].get_string_from_utf8())
