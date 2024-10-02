@@ -1,10 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://dw83j2xbi1wcv"]
+[gd_scene load_steps=7 format=3 uid="uid://dw83j2xbi1wcv"]
 
 [ext_resource type="Script" path="res://levels/main_menu/menu.gd" id="1_xhivv"]
+[ext_resource type="Texture2D" uid="uid://qvhmbpmunmal" path="res://characters/beelinu.png" id="2_14h8x"]
+[ext_resource type="PackedScene" uid="uid://xacjmgv8vrr7" path="res://levels/main_menu/connect_server_prompt.tscn" id="3_kmsct"]
+[ext_resource type="PackedScene" uid="uid://pak7gh2fr2e6" path="res://levels/main_menu/login.tscn" id="4_jy0iw"]
+[ext_resource type="PackedScene" uid="uid://bbwmau6gh1vyx" path="res://levels/main_menu/register.tscn" id="5_qmfex"]
+[ext_resource type="PackedScene" uid="uid://d3juh30766gnm" path="res://levels/main_menu/join.tscn" id="6_j4lva"]
 
 [node name="MainMenu" type="CanvasLayer"]
 
-[node name="Menu" type="CenterContainer" parent="."]
+[node name="Menu" type="HBoxContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -12,68 +17,46 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_xhivv")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Menu"]
-layout_mode = 2
-
-[node name="Name" type="TextEdit" parent="Menu/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-placeholder_text = "Nome"
-scroll_fit_content_height = true
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Menu/VBoxContainer"]
-custom_minimum_size = Vector2(400, 0)
-layout_mode = 2
-
-[node name="CreateRoomPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
+[node name="Art" type="VBoxContainer" parent="Menu"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel"]
+[node name="Label" type="Label" parent="Menu/Art"]
 layout_mode = 2
-text = "Criar Sala"
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 55
+text = "Comunidade
+Beelinu"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="CreateRoomSubmit" type="Button" parent="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel"]
+[node name="CenterContainer" type="CenterContainer" parent="Menu/Art"]
 layout_mode = 2
-text = "Criar"
+size_flags_vertical = 3
 
-[node name="CreateRoomMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel"]
-unique_name_in_owner = true
-modulate = Color(1, 0.101961, 0.101961, 1)
+[node name="TextureRect" type="TextureRect" parent="Menu/Art/CenterContainer"]
+custom_minimum_size = Vector2(200, 200)
 layout_mode = 2
-autowrap_mode = 2
+texture = ExtResource("2_14h8x")
 
-[node name="VSeparator" type="VSeparator" parent="Menu/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-
-[node name="JoinRoomPanel" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Entrar em uma Sala"
-
-[node name="ReloadRoomList" type="Button" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/HBoxContainer"]
-layout_mode = 2
-text = "↻"
-
-[node name="RoomListScroll" type="ScrollContainer" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel"]
-custom_minimum_size = Vector2(0, 200)
-layout_mode = 2
-
-[node name="RoomList" type="VBoxContainer" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/RoomListScroll"]
-unique_name_in_owner = true
+[node name="ConnectServerPrompt" parent="Menu" instance=ExtResource("3_kmsct")]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="JoinRoomMessage" type="Label" parent="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel"]
-unique_name_in_owner = true
+[node name="Login" parent="Menu" instance=ExtResource("4_jy0iw")]
+visible = false
 layout_mode = 2
 
-[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/CreateRoomPanel/CreateRoomSubmit" to="Menu" method="_on_create_room_submit_pressed"]
-[connection signal="pressed" from="Menu/VBoxContainer/HBoxContainer/JoinRoomPanel/HBoxContainer/ReloadRoomList" to="Menu" method="_on_reload_room_list_pressed"]
+[node name="Register" parent="Menu" instance=ExtResource("5_qmfex")]
+visible = false
+layout_mode = 2
+
+[node name="JoinRoom" parent="Menu" instance=ExtResource("6_j4lva")]
+visible = false
+layout_mode = 2
+
+[connection signal="connect_success" from="Menu/ConnectServerPrompt" to="Menu" method="_on_connect_server_prompt_connect_success"]
+[connection signal="go_to_register" from="Menu/Login" to="Menu" method="_on_login_go_to_register"]
+[connection signal="login_success" from="Menu/Login" to="Menu" method="_on_login_login_success"]
+[connection signal="go_to_login" from="Menu/Register" to="Menu" method="_on_register_go_to_login"]
+[connection signal="register_success" from="Menu/Register" to="Menu" method="_on_register_register_success"]

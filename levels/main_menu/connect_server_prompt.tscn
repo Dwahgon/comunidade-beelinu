@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://xacjmgv8vrr7"]
+
+[ext_resource type="Script" path="res://levels/main_menu/connect_server_prompt.gd" id="1_qs48j"]
+
+[node name="ConnectServerPrompt" type="CenterContainer"]
+script = ExtResource("1_qs48j")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
+
+[node name="HBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddressInput" type="TextEdit" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Digite o URL do servidor"
+scroll_fit_content_height = true
+
+[node name="ConnectServerButton" type="Button" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Conectar"
+
+[node name="ConnectingLabel" type="Label" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Conectando..."
+horizontal_alignment = 1
+
+[node name="ConnectError" type="Label" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/ConnectServerButton" to="." method="_on_connect_server_button_pressed"]

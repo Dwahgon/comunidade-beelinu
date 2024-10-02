@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://b4gc6oocn3c8i"]
+
+[node name="Button" type="Button"]
+text_overrun_behavior = 3
+clip_text = true

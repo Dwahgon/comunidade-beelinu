@@ -1,0 +1,69 @@
+[gd_scene load_steps=2 format=3 uid="uid://pak7gh2fr2e6"]
+
+[ext_resource type="Script" path="res://levels/main_menu/login.gd" id="1_r0xju"]
+
+[node name="Login" type="CenterContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_r0xju")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Login"
+horizontal_alignment = 1
+
+[node name="Email" type="LineEdit" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "E-mail"
+
+[node name="Password" type="LineEdit" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Senha"
+secret = true
+
+[node name="GoToRegister" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "ou [url]crie uma nova conta[/url]
+"
+fit_content = true
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="LoginButton" type="Button" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Login"
+
+[node name="Loading" type="Label" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Carregando..."
+horizontal_alignment = 1
+
+[node name="Error" type="Label" parent="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+autowrap_mode = 1
+
+[connection signal="meta_clicked" from="MarginContainer/VBoxContainer/GoToRegister" to="." method="_on_go_to_register_meta_clicked"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/LoginButton" to="." method="_on_button_pressed"]

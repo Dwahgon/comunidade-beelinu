@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://d3juh30766gnm"]
+
+[ext_resource type="Script" path="res://levels/main_menu/join.gd" id="1_idnac"]
+
+[node name="JoinRoom" type="CenterContainer"]
+offset_right = 300.0
+offset_bottom = 394.0
+size_flags_horizontal = 3
+script = ExtResource("1_idnac")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="RoomList" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/RoomList"]
+layout_mode = 2
+text = "Entrar em uma sala"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/RoomList"]
+custom_minimum_size = Vector2(0, 500)
+layout_mode = 2
+
+[node name="RoomList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/RoomList/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CreateRoom" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[connection signal="visibility_changed" from="." to="." method="_load_servers"]
