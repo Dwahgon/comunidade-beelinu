@@ -7,10 +7,10 @@ func _on_button_pressed() -> void:
 	%Loading.visible = true
 	%RegisterButton.visible = false
 	var result = await BackendService.request_register(%Email.text, %Username.text, %Password.text)
-	if result["error"]:
+	if result["error"] and not str(result["error"]).begins_with("2"):
 		%Loading.visible = false
 		%RegisterButton.visible = true
-		%Error.text = "Erro"
+		%Error.text = "Error: " + str(result["error"])
 	else:
 		await BackendService.login(%Email.text, %Password.text)
 		register_success.emit()

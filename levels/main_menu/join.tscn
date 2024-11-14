@@ -22,10 +22,19 @@ layout_mode = 2
 [node name="RoomList" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/RoomList"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/RoomList"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/RoomList/HBoxContainer"]
 layout_mode = 2
 text = "Entrar em uma sala"
 horizontal_alignment = 1
+
+[node name="ReloadButton" type="Button" parent="MarginContainer/VBoxContainer/RoomList/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "↻"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/RoomList"]
 custom_minimum_size = Vector2(0, 500)
@@ -41,3 +50,4 @@ size_flags_vertical = 3
 layout_mode = 2
 
 [connection signal="visibility_changed" from="." to="." method="_load_servers"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/RoomList/HBoxContainer/ReloadButton" to="." method="_on_reload_button_pressed"]
