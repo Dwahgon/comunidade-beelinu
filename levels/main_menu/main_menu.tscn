@@ -55,6 +55,8 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
 [connection signal="connect_success" from="Menu/ConnectServerPrompt" to="Menu" method="_on_connect_server_prompt_connect_success"]
 [connection signal="go_to_register" from="Menu/Login" to="Menu" method="_on_login_go_to_register"]
 [connection signal="login_success" from="Menu/Login" to="Menu" method="_on_login_login_success"]
